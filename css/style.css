@@ -159,7 +159,6 @@ body {
     display: inline-block;
 }
 
-
 .botonSalir {
     background: #2cc197;
     color: white;
@@ -193,5 +192,10 @@ body {
     }
     .logo {
         margin-bottom: 10px;
+    }
+    .iniciarSesion {
+        margin-left: 19%;
+        margin-right: 50%;
+        width: 60%;
     }
 }
