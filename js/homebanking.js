@@ -1,7 +1,7 @@
 //Declaración de variables
 let nombreUsuario = 'mike';
 let saldoCuenta = 10000;
-let limiteExtraccion = saldoCuenta * 0.9;
+let limiteExtraccion = actualizarLimiteExtraccion();
 
 const Agua = {
     nombre: 'agua',
@@ -48,7 +48,7 @@ window.onload = function () {
 function CalcularTransaccion(accion) {
     const value = prompt(`Digita la cantidad de dinero a ${accion}:`);
     if ("" !== value && value !== null) {
-        if (!isNaN(value)) {
+        if (!isNaN(value) && value > 0) {
             switch (accion) {
                 case 'depositar':
                     Transaccion(value, accion);
@@ -84,7 +84,9 @@ function CalcularTransaccion(accion) {
             swal("Upss", "No es un valor valido", "error");
         }
     } else {
-        swal("Upss", "No has digitado ningún valor", "error");
+        if(null !== value){
+            swal("Upss", "No has digitado ningún valor", "error");
+        }
     }
 }
 
@@ -92,16 +94,16 @@ function CalcularTransaccion(accion) {
 function Transaccion(value, accion) {
     var saldoActual = saldoCuenta;
     if (accion == 'depositar') {
-        saldoCuenta += parseInt(value);
-        limiteExtraccion = saldoCuenta * 0.9;
+        sumarSaldo(1, parseInt(value));
+        limiteExtraccion = actualizarLimiteExtraccion();
         swal("Genial!", `Has depositado: $${value} 
                                 Saldo anterior: $${saldoActual} 
                                 Saldo actual: $${saldoCuenta}`);
 
     }
     else {
-        saldoCuenta -= parseInt(value);
-        limiteExtraccion = saldoCuenta * 0.9;
+        sumarSaldo(2, parseInt(value));
+        limiteExtraccion = actualizarLimiteExtraccion();
         swal("Genial!", `Has retirado: $${value} 
                                 Saldo anterior: $${saldoActual} 
                                 Saldo actual: $${saldoCuenta}`);
@@ -139,8 +141,8 @@ function TransferirAmigo(valorCuenta, amigo) {
         if (parseInt(valorCuenta) <= saldoCuenta) {
             if (parseInt(valorCuenta) <= limiteExtraccion) {
                 var saldoActual = saldoCuenta;
-                saldoCuenta -= parseInt(valorCuenta);
-                limiteExtraccion = saldoCuenta * 0.9;
+                sumarSaldo(2, parseInt(valorCuenta));
+                limiteExtraccion = actualizarLimiteExtraccion();
                 alert(`Has transferido: $${valorCuenta} \nCuenta destino: ${amigo}`);
                 actualizarSaldoEnPantalla();
                 actualizarLimiteEnPantalla();
@@ -192,8 +194,8 @@ function realizarPago() {
 function PagoServicio(servicio) {
     if (servicios[servicio].Precio <= saldoCuenta && servicios[servicio].Precio <= limiteExtraccion) {
         var saldoActual = saldoCuenta;
-        saldoCuenta -= servicios[servicio].Precio;
-        limiteExtraccion = saldoCuenta * 0.9;
+        sumarSaldo(2, servicios[servicio].Precio);
+        limiteExtraccion = actualizarLimiteExtraccion();
         swal("Genial!", `Has pagado el servicio de ${servicios[servicio].nombre}.
                             Saldo anterior: $${saldoActual} 
                             Dinero descontado: $${servicios[servicio].Precio} 
@@ -205,9 +207,19 @@ function PagoServicio(servicio) {
     }
 }
 
+//Sumar saldo - 1 para sumar 2 para restar
+function sumarSaldo(operacion, value) {
+    if (operacion === 1) {
+        saldoCuenta += parseInt(value)
+    }
+    else {
+        saldoCuenta -= parseInt(value)
+    }
+}
+
 function cambiarLimiteDeExtraccion() {
     let limite = prompt('Digita el nuevo valor de transacción');
-    if (!isNaN(limite)) {
+    if (!isNaN(limite) && limite > 0) {
         if (limite <= saldoCuenta) {
             var limiteActual = limiteExtraccion;
             limiteExtraccion = parseInt(limite);
@@ -222,7 +234,7 @@ function cambiarLimiteDeExtraccion() {
         }
     }
     else {
-
+        swal("Upss", "El valor digitado no es un valor valido", "error");
     }
 }
 
@@ -246,6 +258,10 @@ function Salir() {
     window.location.href = "./index.html";
 }
 
+// actualizar limite de extracción
+function actualizarLimiteExtraccion() {
+    return saldoCuenta * 0.9;
+}
 
 //Funciones que actualizan el valor de las variables en el HTML
 function cargarNombreEnPantalla() {
